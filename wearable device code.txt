@@ -1,0 +1,102 @@
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+#include <MPU6050.h>
+
+// OLED dimensions
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire);
+
+// MPU6050 object
+MPU6050 mpu;
+
+// Button configuration
+#define BUTTON_PIN 15
+int buttonState = 0;
+int lastButtonState = 0;
+int buttonPressCount = 0;
+int i=0;
+
+// Variables for MPU6050
+float accelX, accelY, accelZ;
+
+void setup() {
+  Serial.begin(115200);
+
+  // Initialize OLED
+  if (!display.begin(SSD1306_PAGEADDR, 0x3C)) {
+    Serial.println("SSD1306 allocation failed");
+    for (;;);
+  }
+  display.clearDisplay();
+
+  // Button setup
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+
+  // MPU6050 initialization
+  Wire.begin();
+  mpu.initialize();
+  if (!mpu.testConnection()) {
+    Serial.println("MPU6050 connection failed!");
+    while (1);
+  }
+  Serial.println("MPU6050 connected.");
+}
+
+void loop() {
+  // Read button state
+  buttonState = digitalRead(BUTTON_PIN);
+
+  // Detect button press and release
+  if (buttonState == LOW && lastButtonState == HIGH) {
+    buttonPressCount++;
+    Serial.println("Button pressed!");
+  }
+  lastButtonState = buttonState;
+
+  // If button pressed 3 times, display a message
+  if (buttonPressCount == 3) {
+    for(i=0;i<10;i++){
+    displayMessage("SOS");
+    displayMessage("!!!");
+    delay(550);
+  }
+  buttonPressCount=0;
+  }
+
+    
+  delay(100);
+  // Read MPU6050 data
+  accelX = mpu.getAccelerationX() / 16384.0; // Scale factor for 16g range
+  accelY = mpu.getAccelerationY() / 16384.0;
+  accelZ = mpu.getAccelerationZ() / 16384.0;
+
+  // Display orientation data
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(0, 0);
+
+  display.println("Orientation Data:");
+  display.printf("AccelX: %.2f\n", accelX);
+  display.printf("AccelY: %.2f\n", accelY);
+  display.printf("AccelZ: %.2f\n", accelZ);
+
+  display.display();
+
+  // Update every 500ms
+  
+}
+
+void displayMessage(const char* message) {
+  display.clearDisplay();
+  display.setTextSize(7);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(0, 20);
+  display.println(message);
+  display.display();
+  delay(100); // Show message for 2 seconds
+  
+  
+}
