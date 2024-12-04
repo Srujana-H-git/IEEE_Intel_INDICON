@@ -1,0 +1,65 @@
+package com.example.womensafetywatch
+
+import android.os.Bundle
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.womensafetywatch.ui.theme.WomenSafetyWatchTheme
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            WomenSafetyWatchTheme {
+                HomeScreen()
+            }
+        }
+    }
+}
+
+@Composable
+fun HomeScreen() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // App Title
+            Text(
+                text = "Women's Safety Watch",
+                fontSize = 20.sp,
+                style = MaterialTheme.typography.h6
+            )
+
+            // Send Alert Button
+            Button(onClick = { showToast("Alert Sent!") }) {
+                Text(text = "Send Alert")
+            }
+
+            // Emergency Contacts Button
+            Button(onClick = { showToast("Emergency Contacts Accessed!") }) {
+                Text(text = "Emergency Contacts")
+            }
+
+            // Help Button
+            Button(onClick = { showToast("Help Section Accessed!") }) {
+                Text(text = "Help")
+            }
+        }
+    }
+}
+
+// Function to show a simple toast message
+fun showToast(message: String) {
+    Toast.makeText(MainActivity().applicationContext, message, Toast.LENGTH_SHORT).show()
+}
